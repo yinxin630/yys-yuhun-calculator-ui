@@ -269,8 +269,9 @@ export default class Calculator extends Vue {
     .el-select {
         width: 100%;
     }
-    input {
-        background-color: #f9f9f9;
+    input, .el-checkbox__inner, .el-input-number__decrease, .el-input-number__increase {
+        background-color: #11171f;
+        border: 1px solid #333b47;
     }
 }
 </style>
