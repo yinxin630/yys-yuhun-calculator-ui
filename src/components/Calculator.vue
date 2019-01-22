@@ -4,9 +4,6 @@
             <p>《阴阳师》御魂组合计算器</p>
         </header>
         <section class="main">
-            <div class="control">
-                <Button type="primary">选择输入文件</Button>
-            </div>
             <Form class="filter-options-form">
                 <FormItem label="">
                     <Select v-model="firstYunhun" placeholder="请选择主御魂套装">
@@ -60,32 +57,46 @@
                     <Input placeholder="格式:基础生命,基础爆伤,期望值" />
                 </FormItem>
                 <FormItem label="目标属性下限">
+                    <Tooltip content="点击已有属性可将其删除" placement="right">
+                        <i class="el-icon-info"></i>
+                    </Tooltip>
                     <br/>
                     <div class="attribute-inputs">
                         <label>属性:</label>
                         <Select v-model="lowerAttribute">
                             <Option v-for="attr in attributes" :key="attr" :label="attr" :value="attr"></Option>
                         </Select>
-                        <label>数值:</label>
-                        <InputNumber :min="0" :max="999" size="small" v-model="lowerValue"></InputNumber>
+                        <label v-show="lowerAttribute !== ''">数值:</label>
+                        <InputNumber :min="0" :max="999" size="small" v-model="lowerValue" v-show="lowerAttribute !== ''"></InputNumber>
                     </div>
                 </FormItem>
                 <FormItem class="attribute-results">
                     <span v-for="lower in this.lowerList" :key="lower" @click="removeLower(lower)">{{lower}}</span>
                 </FormItem>
                 <FormItem label="目标属性上限">
+                    <Tooltip content="点击已有属性可将其删除" placement="right">
+                        <i class="el-icon-info"></i>
+                    </Tooltip>
                     <br/>
                     <div class="attribute-inputs">
                         <label>属性:</label>
                         <Select v-model="upperAttribute">
                             <Option v-for="attr in attributes" :key="attr" :label="attr" :value="attr"></Option>
                         </Select>
-                        <label>数值:</label>
-                        <InputNumber :min="0" :max="999" size="small" v-model="upperValue"></InputNumber>
+                        <label v-show="upperAttribute !== ''">数值:</label>
+                        <InputNumber :min="0" :max="999" size="small" v-model="upperValue" v-show="upperAttribute !== ''"></InputNumber>
                     </div>
                 </FormItem>
                 <FormItem class="attribute-results">
                     <span v-for="upper in this.upperList" :key="upper" @click="removeUpper(upper)">{{upper}}</span>
+                </FormItem>
+            </Form>
+            <Form class="control">
+                <FormItem label="输入文件">
+                    <Button type="primary" @click="selectFile">选择文件</Button>
+                </FormItem>
+                <FormItem>
+                    <Button type="primary">开始计算</Button>
                 </FormItem>
             </Form>
         </section>
@@ -94,10 +105,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Message } from 'element-ui';
+import { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Message, Tooltip } from 'element-ui';
 
 @Component({
-    components: { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber },
+    components: { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Tooltip },
 })
 export default class Calculator extends Vue {
     /**
@@ -173,11 +184,6 @@ export default class Calculator extends Vue {
      * 添加下限属性
      */
     addLower(): void {
-        if (!this.lowerAttribute) {
-            Message.error('请选择属性');
-            return;
-        }
-
         const newItem = `${this.lowerAttribute}+${this.lowerValue}${this.lowerAttribute === '速度' ? '' : '%'}`;
         const index = this.lowerList.findIndex(lower => lower.startsWith(this.lowerAttribute));
         if (index === -1) {
@@ -209,11 +215,6 @@ export default class Calculator extends Vue {
      * 添加上限属性
      */
     addUpper(): void {
-        if (!this.upperAttribute) {
-            Message.error('请选择属性');
-            return;
-        }
-
         const newItem = `${this.upperAttribute}+${this.upperValue}${this.upperAttribute === '速度' ? '' : '%'}`;
         const index = this.upperList.findIndex(upper => upper.startsWith(this.upperAttribute));
         if (index === -1) {
@@ -239,6 +240,38 @@ export default class Calculator extends Vue {
     @Watch('upperValue')
     onUpperValueChange(val: string) {
         this.addUpper();
+    }
+
+    /**
+     * 选择文件
+     */
+    selectFile() {
+        const $input = document.createElement('input');
+        $input.style.display = 'none';
+        $input.setAttribute('type', 'file');
+        $input.setAttribute('accept', '*/*');
+        // 判断用户是否点击取消, 原生没有提供专门事件, 用hack的方法实现
+        $input.onclick = () => {
+            $input.value = '';
+            document.body.onfocus = () => {
+                // onfocus事件会比$input.onchange事件先触发, 因此需要延迟一段时间
+                setTimeout(() => {
+                    if ($input.value.length === 0) {
+                        // 未选择文件
+                    }
+                    document.body.onfocus = null;
+                }, 500);
+            };
+        };
+        $input.onchange = (e: any) => {
+            const file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            console.log(file);
+        };
+        $input.click();
     }
 }
 </script>
@@ -276,6 +309,12 @@ export default class Calculator extends Vue {
 
         .control {
             width: 200px;
+            padding: 4px 8px;
+
+            .el-button {
+                width: 100%;
+                margin-bottom: 12px;
+            }
         }
         .filter-options-form {
             width: 290px;
@@ -316,6 +355,9 @@ export default class Calculator extends Vue {
                     user-select: none;
                 }
             }
+        }
+        .el-icon-info {
+            color: #ddd;
         }
     }
     .el-form-item__label, .el-checkbox__label {
@@ -364,6 +406,10 @@ export default class Calculator extends Vue {
     input, .el-checkbox__inner, .el-input-number__decrease, .el-input-number__increase {
         background-color: #11171f;
         border: 1px solid #333b47;
+        color: #ccc;
+        &::placeholder {
+            color: #606266;
+        }
     }
 }
 </style>
