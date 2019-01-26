@@ -5,59 +5,62 @@
         </header>
         <section class="main">
             <Form class="filter-options-form">
-                <FormItem label="">
-                    <Select v-model="firstYunhun" placeholder="请选择主御魂套装">
+                <FormItem label="御魂套装组合" class="yuhun-package-input">
+                    <Tooltip content="点击已选御魂可将其删除" placement="right">
+                        <i class="el-icon-info"></i>
+                    </Tooltip>
+                    <br/>
+                    <Select class="yuhun" v-model="yuhunPackage" placeholder="选择御魂套装">
                         <Option v-for="yuhun in yunhunOptions" :key="yuhun" :label="yuhun" :value="yuhun"></Option>
                     </Select>
-                </FormItem>
-                <FormItem label="">
-                    <Select v-model="secondYunhun" placeholder="请选择副御魂套装">
-                        <Option v-for="yuhun in yunhunOptions" :key="yuhun" :label="yuhun" :value="yuhun"></Option>
-                    </Select>
+                    <Button type="primary" @click="addYuhunPackageLimit" :disabled="disableAddYuhunPackageButton">添加</Button>
+                    <div class="select-yuhun-list">
+                        <span v-for="yuhunPackage in this.yuhunPackageList" :key="yuhunPackage" @click="removeYuhunPackageLimit(yuhunPackage)">{{yuhunPackage}}</span>
+                    </div>
                 </FormItem>
                 <FormItem>
                     <Checkbox v-model="usePackage" label="限定使用套装"></Checkbox>
                     <Checkbox v-model="useAttack" label="限定使用输出御魂"></Checkbox>
                 </FormItem>
                 <FormItem label="二号位属性" class="multi-checkbox">
-                    <CheckboxGroup v-model="twoAttribute">
-                        <Checkbox label="攻击+55%"></Checkbox>
-                        <Checkbox label="生命+55%"></Checkbox>
-                        <Checkbox label="防御+55%"></Checkbox>
-                        <Checkbox label="速度+57"></Checkbox>
+                    <CheckboxGroup v-model="secondAttributeList">
+                        <Checkbox label="攻击加成,55"></Checkbox>
+                        <Checkbox label="生命加成,55"></Checkbox>
+                        <Checkbox label="防御加成,55"></Checkbox>
+                        <Checkbox label="速度,57"></Checkbox>
                     </CheckboxGroup>
                 </FormItem>
                 <FormItem label="四号位属性" class="multi-checkbox">
-                    <CheckboxGroup v-model="fourAttribute">
-                        <Checkbox label="攻击+55%"></Checkbox>
-                        <Checkbox label="生命+55%"></Checkbox>
-                        <Checkbox label="防御+55%"></Checkbox>
-                        <Checkbox label="命中+55%"></Checkbox>
-                        <Checkbox label="抵抗+55%"></Checkbox>
+                    <CheckboxGroup v-model="fourthAttributeList">
+                        <Checkbox label="攻击加成,55"></Checkbox>
+                        <Checkbox label="生命加成,55"></Checkbox>
+                        <Checkbox label="防御加成,55"></Checkbox>
+                        <Checkbox label="效果命中,55"></Checkbox>
+                        <Checkbox label="效果抵抗,55"></Checkbox>
                     </CheckboxGroup>
                 </FormItem>
                 <FormItem label="六号位属性" class="multi-checkbox">
-                    <CheckboxGroup v-model="sixAttribute">
-                        <Checkbox label="攻击+55%"></Checkbox>
-                        <Checkbox label="生命+55%"></Checkbox>
-                        <Checkbox label="防御+55%"></Checkbox>
-                        <Checkbox label="暴击+55%"></Checkbox>
-                        <Checkbox label="爆伤+89%"></Checkbox>
+                    <CheckboxGroup v-model="sixthAttributeList">
+                        <Checkbox label="攻击加成,55"></Checkbox>
+                        <Checkbox label="生命加成,55"></Checkbox>
+                        <Checkbox label="防御加成,55"></Checkbox>
+                        <Checkbox label="暴击,55"></Checkbox>
+                        <Checkbox label="暴击伤害,89"></Checkbox>
                     </CheckboxGroup>
                 </FormItem>
                 <FormItem label="">
-                    <Input placeholder="忽略指定关键字御魂(以,分隔)" />
+                    <Input placeholder="忽略指定关键字御魂(以,分隔)" v-model="ignoreSerial" />
                 </FormItem>
             </Form>
             <Form class="expect-options-form">
                 <FormItem class="input-item" label="伤害期望">
-                    <Input placeholder="格式:基础攻击,基础爆伤,期望值" />
+                    <Input placeholder="格式:基础攻击,基础爆伤,期望值" v-model="damageExpect" />
                 </FormItem>
                 <FormItem class="input-item" label="治疗期望">
-                    <Input placeholder="格式:基础生命,基础爆伤,期望值" />
+                    <Input placeholder="格式:基础生命,基础爆伤,期望值" v-model="healthExpect" />
                 </FormItem>
                 <FormItem label="目标属性下限">
-                    <Tooltip content="点击已有属性可将其删除" placement="right">
+                    <Tooltip content="点击已选属性可将其删除" placement="right">
                         <i class="el-icon-info"></i>
                     </Tooltip>
                     <br/>
@@ -74,7 +77,7 @@
                     <span v-for="lower in this.lowerList" :key="lower" @click="removeLower(lower)">{{lower}}</span>
                 </FormItem>
                 <FormItem label="目标属性上限">
-                    <Tooltip content="点击已有属性可将其删除" placement="right">
+                    <Tooltip content="点击已选属性可将其删除" placement="right">
                         <i class="el-icon-info"></i>
                     </Tooltip>
                     <br/>
@@ -96,7 +99,7 @@
                     <Button type="primary" @click="selectFile">选择文件</Button>
                 </FormItem>
                 <FormItem>
-                    <Button type="primary">开始计算</Button>
+                    <Button type="primary" @click="run">开始计算</Button>
                 </FormItem>
             </Form>
         </section>
@@ -106,19 +109,20 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Message, Tooltip } from 'element-ui';
+import axios from 'axios';
 
 @Component({
     components: { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Tooltip },
 })
 export default class Calculator extends Vue {
     /**
-     * 主御魂御魂
+     * 御魂套装
      */
-    private firstYunhun = ''
+    private yuhunPackage = ''
     /**
-     * 副御魂
+     * 御魂套装限制列表
      */
-    private secondYunhun = ''
+    private yuhunPackageList: string[] = []
 
     /**
      * 是否使用套装
@@ -132,15 +136,29 @@ export default class Calculator extends Vue {
     /**
      * 二号位属性
      */
-    private twoAttribute: string[] = []
+    private secondAttributeList: string[] = []
     /**
      * 四号位属性
      */
-    private fourAttribute: string[] = []
+    private fourthAttributeList: string[] = []
     /**
      * 六号位属性
      */
-    private sixAttribute: string[] = []
+    private sixthAttributeList: string[] = []
+
+    /**
+     * 忽略指定关键字御魂
+     */
+    private ignoreSerial = ''
+
+    /**
+     * 伤害期望
+     */
+    private damageExpect = ''
+    /**
+     * 生命期望
+     */
+    private healthExpect = ''
 
     /**
      * 下限属性
@@ -171,7 +189,7 @@ export default class Calculator extends Vue {
      * 御魂套装选项
      */
     get yunhunOptions(): string[] {
-        return ['不限', '针女', '破势', '网切', '三味', '镇墓兽', '伤魂鸟', '蝠翼', '鸣屋', '心眼', '狰', '轮入道', '狂骨', '阴摩罗', '魍魉之匣', '骰子鬼', '返魂香', '幽谷响', '蚌精', '火灵', '树妖', '地藏像', '薙魂', '镜姬', '钟灵', '被服', '涅槃之火', '招财猫', '魅妖', '反枕', '木魅', '日女己时', '雪幽魂', '珍珠', '荒骷髅', '土蜘蛛', '地震鲶', '蜃气楼', '胧车'];
+        return ['攻击加成,2', '暴击,2', '生命加成,2', '效果命中,2', '效果抵抗,2','针女,4', '破势,4', '网切,4', '三味,4', '镇墓兽,4', '伤魂鸟,4', '蝠翼,4', '鸣屋,4', '心眼,4', '狰,4', '轮入道,4', '狂骨,4', '阴摩罗,4', '魍魉之匣,4', '骰子鬼,4', '返魂香,4', '幽谷响,4', '蚌精,4', '火灵,4', '树妖,4', '地藏像,4', '薙魂,4', '镜姬,4', '钟灵,4', '被服,4', '涅槃之火,4', '招财猫,4', '魅妖,4', '反枕,4', '木魅,4', '日女己时,4', '雪幽魂,4', '珍珠,4', '荒骷髅,2', '土蜘蛛,2', '地震鲶,2', '蜃气楼,2', '胧车,2'];
     }
     /**
      * 属性选项
@@ -180,11 +198,41 @@ export default class Calculator extends Vue {
         return ['暴击', '暴击伤害', '效果命中', '效果抵抗', '速度', '攻击加成', '生命加成', '防御加成'];
     }
 
+    get disableAddYuhunPackageButton(): boolean {
+        let currentSelectCount = 0;
+        if (this.yuhunPackage) {
+            const [, count] = this.yuhunPackage.split(',');
+            currentSelectCount = +count;
+        }
+
+        return currentSelectCount + this.selectedYuhunPackageCount > 6;
+    }
+
+    get selectedYuhunPackageCount(): number {
+        return this.yuhunPackageList
+            .map(yuhunPackage => {
+                const [, count] = yuhunPackage.split(',');
+                return +count;
+            })
+            .reduce((sum, value) => sum += value, 0);
+    }
+
+    /**
+     * 添加御魂套装限制
+     */
+    addYuhunPackageLimit(): void {
+        this.yuhunPackageList.push(this.yuhunPackage);
+    }
+    removeYuhunPackageLimit(yuhunPackage: string): void {
+        const index = this.yuhunPackageList.findIndex(x => x === yuhunPackage);
+        this.yuhunPackageList.splice(index, 1);
+    }
+
     /**
      * 添加下限属性
      */
     addLower(): void {
-        const newItem = `${this.lowerAttribute}+${this.lowerValue}${this.lowerAttribute === '速度' ? '' : '%'}`;
+        const newItem = `${this.lowerAttribute},${this.lowerValue || 0}`;
         const index = this.lowerList.findIndex(lower => lower.startsWith(this.lowerAttribute));
         if (index === -1) {
             this.lowerList.push(newItem);
@@ -215,7 +263,7 @@ export default class Calculator extends Vue {
      * 添加上限属性
      */
     addUpper(): void {
-        const newItem = `${this.upperAttribute}+${this.upperValue}${this.upperAttribute === '速度' ? '' : '%'}`;
+        const newItem = `${this.upperAttribute},${this.upperValue || 0}`;
         const index = this.upperList.findIndex(upper => upper.startsWith(this.upperAttribute));
         if (index === -1) {
             this.upperList.push(newItem);
@@ -273,6 +321,34 @@ export default class Calculator extends Vue {
         };
         $input.click();
     }
+
+    /**
+     * 开始计算
+     */
+    run() {
+        const api = process.env.NODE_ENV === 'development' ? 'http://localhost:2019/calculate' : '/calculate';
+        axios.post(api, {
+            source_data: '/Users/yinxin/github/calculator_of_Onmyoji/example/data_Template.xls',
+            output_file: '/Users/yinxin/github/calculator_of_Onmyoji/data_Template-result.xls',
+            mitama_suit: this.yuhunPackageList.join('.'),
+            prop_limit: this.lowerList.join('.'),
+            upper_prop_limit: this.upperList.join('.'),
+            sec_prop_value: this.secondAttributeList.join('.'),
+            fth_prop_value: this.fourthAttributeList.join('.'),
+            sth_prop_value: this.sixthAttributeList.join('.'),
+            ignore_serial: this.ignoreSerial,
+            all_suit: this.usePackage ? 'True' : 'False',
+            damage_limit: this.damageExpect || '0,0,0',
+            health_limit: this.healthExpect || '0,0,0',
+            attack_only: this.useAttack ? 'True' : 'False',
+            effective_secondary_prop: '',
+            effective_secondary_prop_num: '',
+        }).then(() => {
+            Message.success('计算完毕');
+        }).catch(() => {
+            Message.error('计算失败');
+        });
+    }
 }
 </script>
 
@@ -319,6 +395,47 @@ export default class Calculator extends Vue {
         .filter-options-form {
             width: 290px;
             margin: 0 8px;
+
+            .yuhun-package-input {
+                height: 94px;
+
+                .el-tooltip {
+                    position: relative;
+                    top: -8px;
+                }
+                .el-form-item__label {
+                    line-height: 24px;
+                }
+                .el-select {
+                    width: 180px;
+                    top: -15px;
+                }
+                .el-button {
+                    margin-left: 10px;
+                    width: 90px;
+                    height: 34px;
+                    position: relative;
+                    top: -13px;
+
+                    span {
+                        position: relative;
+                        top: -3px;
+                    }
+                }
+                .select-yuhun-list {
+                    width: 100%;
+                    height: 30px;
+                    position: absolute;
+                    top: 70px;
+                    line-height: 30px;
+
+                    & > span {
+                        color: #409EFF;
+                        margin-right: 12px;
+                        cursor: pointer;
+                    }
+                }
+            }
         }
         .expect-options-form {
             flex: 1;
