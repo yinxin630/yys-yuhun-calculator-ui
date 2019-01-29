@@ -1,7 +1,7 @@
 <template>
     <div class="calculator">
         <header class="header">
-            <p>《阴阳师》御魂组合计算器</p>
+            <p>《阴阳师》御魂计算器v4.0</p>
         </header>
         <section class="main">
             <Form class="filter-options-form">
@@ -96,6 +96,9 @@
             </Form>
             <Form class="control">
                 <FormItem label="输入文件">
+                    <br/>
+                    <p v-if="filename">{{filename}}</p>
+                    <p v-else>尚未选择御魂数据文件</p>
                     <Button type="primary" @click="selectFile">选择文件</Button>
                 </FormItem>
                 <FormItem>
@@ -184,6 +187,11 @@ export default class Calculator extends Vue {
      * 上限配置列表
      */
     private upperList: string[] = []
+
+    /**
+     * 选择的文件名称
+     */
+    private filename = ''
 
     /**
      * 御魂套装选项
@@ -297,7 +305,7 @@ export default class Calculator extends Vue {
         const $input = document.createElement('input');
         $input.style.display = 'none';
         $input.setAttribute('type', 'file');
-        $input.setAttribute('accept', '*/*');
+        $input.setAttribute('accept', '.json,.xls');
         // 判断用户是否点击取消, 原生没有提供专门事件, 用hack的方法实现
         $input.onclick = () => {
             $input.value = '';
@@ -317,7 +325,7 @@ export default class Calculator extends Vue {
                 return;
             }
 
-            console.log(file);
+            this.filename = file.name;
         };
         $input.click();
     }
@@ -326,10 +334,14 @@ export default class Calculator extends Vue {
      * 开始计算
      */
     run() {
+        if (!this.filename) {
+            Message.warning('请先选择御魂数据文件');
+            return;
+        }
+
         const api = process.env.NODE_ENV === 'development' ? 'http://localhost:2019/calculate' : '/calculate';
         axios.post(api, {
-            source_data: '/Users/yinxin/github/calculator_of_Onmyoji/example/data_Template.xls',
-            output_file: '/Users/yinxin/github/calculator_of_Onmyoji/data_Template-result.xls',
+            src_filename: 'android-1-22.json',
             mitama_suit: this.yuhunPackageList.join('.'),
             prop_limit: this.lowerList.join('.'),
             upper_prop_limit: this.upperList.join('.'),
@@ -343,9 +355,18 @@ export default class Calculator extends Vue {
             attack_only: this.useAttack ? 'True' : 'False',
             effective_secondary_prop: '',
             effective_secondary_prop_num: '',
-        }).then(() => {
-            Message.success('计算完毕');
-        }).catch(() => {
+        }, {
+            validateStatus: function (status) {
+                return status >= 200 && status <= 500; 
+            },
+        }).then((result) => {
+            if (result.data.reason) {
+                Message.error('计算失败');
+                console.error(result.data.reason);
+            } else {
+                Message.success(`计算完毕, 组合数量:${result.data.result_num}`);
+            }
+        }).catch((err) => {
             Message.error('计算失败');
         });
     }
@@ -387,6 +408,12 @@ export default class Calculator extends Vue {
             width: 200px;
             padding: 4px 8px;
 
+            p {
+                color: #ccc;
+                line-height: 28px;
+                position: relative;
+                top: -6px;
+            }
             .el-button {
                 width: 100%;
                 margin-bottom: 12px;
