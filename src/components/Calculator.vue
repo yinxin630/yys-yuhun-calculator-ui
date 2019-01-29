@@ -1,7 +1,7 @@
 <template>
     <div class="calculator">
         <header class="header">
-            <p>《阴阳师》御魂计算器v4.0</p>
+            <p>《阴阳师》御魂计算器</p>
         </header>
         <section class="main">
             <Form class="filter-options-form">
@@ -357,7 +357,7 @@ export default class Calculator extends Vue {
             effective_secondary_prop_num: '',
         }, {
             validateStatus: function (status) {
-                return status >= 200 && status <= 500; 
+                return status >= 200 && status <= 500;
             },
         }).then((result) => {
             if (result.data.reason) {
