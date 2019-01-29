@@ -341,7 +341,7 @@ export default class Calculator extends Vue {
 
         const api = process.env.NODE_ENV === 'development' ? 'http://localhost:2019/calculate' : '/calculate';
         axios.post(api, {
-            src_filename: 'android-1-22.json',
+            src_filename: this.filename,
             mitama_suit: this.yuhunPackageList.join('.'),
             prop_limit: this.lowerList.join('.'),
             upper_prop_limit: this.upperList.join('.'),
