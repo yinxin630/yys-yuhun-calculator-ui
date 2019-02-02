@@ -107,6 +107,13 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, Input, InputNumber, Message, Tag } from 'element-ui';
 import axios from 'axios';
 
+const api = '//localhost:2019/calculate';
+const axiosOption = {
+    validateStatus: function (status: number) {
+        return status >= 200 && status <= 500;
+    },
+}
+
 @Component({
     components: { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, Input, InputNumber, Tag },
 })
@@ -356,7 +363,6 @@ export default class Calculator extends Vue {
             return;
         }
 
-        const api = process.env.NODE_ENV === 'development' ? 'http://localhost:2019/calculate' : '/calculate';
         axios.post(api, {
             src_filename: this.filename,
             mitama_suit: this.yuhunPackageList.join('.'),
@@ -372,16 +378,21 @@ export default class Calculator extends Vue {
             attack_only: this.useAttack ? 'True' : 'False',
             effective_secondary_prop: '',
             effective_secondary_prop_num: '',
-        }, {
-            validateStatus: function (status) {
-                return status >= 200 && status <= 500;
-            },
-        }).then((result) => {
-            if (result.data.reason) {
-                Message.error('计算失败');
-                console.error(result.data.reason);
-            } else {
-                Message.success(`计算完毕, 组合数量:${result.data.result_num}`);
+        }, axiosOption).then((result) => {
+            switch(result.status) {
+                case 500: {
+                    Message.error('计算失败, 服务端错误');
+                    console.error(result.data.reason);
+                    break;
+                }
+                case 200: {
+                    Message.success(`计算完毕, 组合数量:${result.data.result_num}`);
+                    break;
+                }
+                default: {
+                    Message.error(`计算失败, 服务端返回状态码:${result.status}`);
+                    break;
+                }
             }
         }).catch((err) => {
             Message.error('计算失败');
