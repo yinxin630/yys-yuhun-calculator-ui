@@ -8,7 +8,9 @@
                 <FormItem label="御魂套装组合" class="yuhun-package-input">
                     <br/>
                     <Select class="yuhun" v-model="yuhunPackage" placeholder="选择御魂套装">
-                        <Option v-for="yuhun in yunhunOptions" :key="yuhun" :label="yuhun" :value="yuhun"></Option>
+                        <OptionGroup v-for="group in yuhunOptions" :key="group.name" :label="group.name">
+                            <Option v-for="yuhun in group.list" :key="yuhun" :label="yuhun" :value="yuhun"></Option>
+                        </OptionGroup>
                     </Select>
                     <Button type="primary" @click="addYuhunPackageLimit" :disabled="disableAddYuhunPackageButton">添加</Button>
                     <div class="select-yuhun-list">
@@ -102,11 +104,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Message, Tag } from 'element-ui';
+import { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, Input, InputNumber, Message, Tag } from 'element-ui';
 import axios from 'axios';
 
 @Component({
-    components: { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Tag },
+    components: { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, Input, InputNumber, Tag },
 })
 export default class Calculator extends Vue {
     /**
@@ -187,8 +189,32 @@ export default class Calculator extends Vue {
     /**
      * 御魂套装选项
      */
-    get yunhunOptions(): string[] {
-        return ['攻击加成,2', '暴击,2', '生命加成,2', '效果命中,2', '效果抵抗,2','针女,4', '破势,4', '网切,4', '三味,4', '镇墓兽,4', '伤魂鸟,4', '蝠翼,4', '鸣屋,4', '心眼,4', '狰,4', '轮入道,4', '狂骨,4', '阴摩罗,4', '魍魉之匣,4', '骰子鬼,4', '返魂香,4', '幽谷响,4', '蚌精,4', '火灵,4', '树妖,4', '地藏像,4', '薙魂,4', '镜姬,4', '钟灵,4', '被服,4', '涅槃之火,4', '招财猫,4', '魅妖,4', '反枕,4', '木魅,4', '日女己时,4', '雪幽魂,4', '珍珠,4', '荒骷髅,2', '土蜘蛛,2', '地震鲶,2', '蜃气楼,2', '胧车,2'];
+    get yuhunOptions(): Object[] {
+        return [{
+            name: '散件',
+            list: ['攻击加成,2', '暴击,2', '生命加成,2', '效果命中,2', '效果抵抗,2'],
+        }, {
+            name: '首领御魂',
+            list: ['荒骷髅,2', '土蜘蛛,2', '地震鲶,2', '蜃气楼,2', '胧车,2'],
+        }, {
+            name: '暴击',
+            list: ['针女,4', '破势,4', '网切,4', '三味,4', '伤魂鸟,4', '镇魂兽,4'],
+        }, {
+            name: '攻击加成',
+            list: ['蝠翼,4', '鸣屋,4', '心眼,4', '狰,4', '轮入道,4', '狂骨,4', '阴摩罗,4'],
+        }, {
+            name: '生命加成',
+            list: ['树妖,4', '地藏像,4', '薙魂,4', '镜姬,4', '钟灵,4', '涅槃之火,4', '被服,4'],
+        }, {
+            name: '防御加成',
+            list: ['珍珠,4', '魅妖,4', '雪幽魂,4', '招财猫,4', '反枕,4', '日女己时,4', '木魅'],
+        }, {
+            name: '效果命中',
+            list: ['蚌精,4', '火灵,4'],
+        }, {
+            name: '效果抵抗',
+            list: ['骰子鬼,4', '返魂香,4', '幽谷响,4', '魍魉之匣', ],
+        }]
     }
     /**
      * 属性选项
