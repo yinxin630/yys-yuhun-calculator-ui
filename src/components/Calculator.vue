@@ -6,16 +6,13 @@
         <section class="main">
             <Form class="filter-options-form">
                 <FormItem label="御魂套装组合" class="yuhun-package-input">
-                    <Tooltip content="点击已选御魂可将其删除" placement="right">
-                        <i class="el-icon-info"></i>
-                    </Tooltip>
                     <br/>
                     <Select class="yuhun" v-model="yuhunPackage" placeholder="选择御魂套装">
                         <Option v-for="yuhun in yunhunOptions" :key="yuhun" :label="yuhun" :value="yuhun"></Option>
                     </Select>
                     <Button type="primary" @click="addYuhunPackageLimit" :disabled="disableAddYuhunPackageButton">添加</Button>
                     <div class="select-yuhun-list">
-                        <span v-for="yuhunPackage in this.yuhunPackageList" :key="yuhunPackage" @click="removeYuhunPackageLimit(yuhunPackage)">{{yuhunPackage}}</span>
+                        <Tag v-for="yuhunPackage in this.yuhunPackageList" closable :key="yuhunPackage" @close="removeYuhunPackageLimit(yuhunPackage)">{{yuhunPackage}}</Tag>
                     </div>
                 </FormItem>
                 <FormItem>
@@ -60,9 +57,6 @@
                     <Input placeholder="格式:基础生命,基础爆伤,期望值" v-model="healthExpect" />
                 </FormItem>
                 <FormItem label="目标属性下限">
-                    <Tooltip content="点击已选属性可将其删除" placement="right">
-                        <i class="el-icon-info"></i>
-                    </Tooltip>
                     <br/>
                     <div class="attribute-inputs">
                         <label>属性:</label>
@@ -74,12 +68,9 @@
                     </div>
                 </FormItem>
                 <FormItem class="attribute-results">
-                    <span v-for="lower in this.lowerList" :key="lower" @click="removeLower(lower)">{{lower}}</span>
+                    <Tag v-for="lower in this.lowerList" closable :key="lower.split(',')[0]" @close="removeLower(lower)">{{lower}}</Tag>
                 </FormItem>
                 <FormItem label="目标属性上限">
-                    <Tooltip content="点击已选属性可将其删除" placement="right">
-                        <i class="el-icon-info"></i>
-                    </Tooltip>
                     <br/>
                     <div class="attribute-inputs">
                         <label>属性:</label>
@@ -91,7 +82,7 @@
                     </div>
                 </FormItem>
                 <FormItem class="attribute-results">
-                    <span v-for="upper in this.upperList" :key="upper" @click="removeUpper(upper)">{{upper}}</span>
+                    <Tag v-for="upper in this.upperList" closable :key="upper.split(',')[0]" @close="removeUpper(upper)">{{upper}}</Tag>
                 </FormItem>
             </Form>
             <Form class="control">
@@ -111,11 +102,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Message, Tooltip } from 'element-ui';
+import { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Message, Tag } from 'element-ui';
 import axios from 'axios';
 
 @Component({
-    components: { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Tooltip },
+    components: { Form, FormItem, Button, Select, Option, CheckboxGroup, Checkbox, Input, InputNumber, Tag },
 })
 export default class Calculator extends Vue {
     /**
@@ -426,10 +417,6 @@ export default class Calculator extends Vue {
             .yuhun-package-input {
                 height: 94px;
 
-                .el-tooltip {
-                    position: relative;
-                    top: -8px;
-                }
                 .el-form-item__label {
                     line-height: 24px;
                 }
@@ -455,12 +442,6 @@ export default class Calculator extends Vue {
                     position: absolute;
                     top: 70px;
                     line-height: 30px;
-
-                    & > span {
-                        color: #409EFF;
-                        margin-right: 12px;
-                        cursor: pointer;
-                    }
                 }
             }
         }
