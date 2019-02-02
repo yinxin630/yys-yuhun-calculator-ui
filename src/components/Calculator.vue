@@ -433,7 +433,7 @@ export default class Calculator extends Vue {
         display: flex;
 
         .control {
-            width: 200px;
+            width: 210px;
             padding: 4px 8px;
 
             p {
@@ -448,7 +448,7 @@ export default class Calculator extends Vue {
             }
         }
         .filter-options-form {
-            width: 290px;
+            width: 300px;
             margin: 0 8px;
 
             .yuhun-package-input {
@@ -479,6 +479,10 @@ export default class Calculator extends Vue {
                     position: absolute;
                     top: 70px;
                     line-height: 30px;
+
+                    .el-tag {
+                        margin-left: 3px;
+                    }
                 }
             }
         }
