@@ -61,33 +61,22 @@
                 <FormItem class="input-item" label="治疗期望">
                     <Input placeholder="格式:基础生命,基础爆伤,期望值" v-model="healthExpect" />
                 </FormItem>
-                <FormItem label="目标属性下限">
+                <FormItem>
+                    <p class="title">目标属性限制</p>
+                    <label>属性:</label>
+                    <Select v-model="targetAttribute">
+                        <Option v-for="attr in attributes" :key="attr" :label="attr" :value="attr"></Option>
+                    </Select>
                     <br/>
-                    <div class="attribute-inputs">
-                        <label>属性:</label>
-                        <Select v-model="lowerAttribute">
-                            <Option v-for="attr in attributes" :key="attr" :label="attr" :value="attr"></Option>
-                        </Select>
-                        <label v-show="lowerAttribute !== ''">数值:</label>
-                        <InputNumber :min="0" :max="999" size="small" v-model="lowerValue" v-show="lowerAttribute !== ''"></InputNumber>
+                    <div v-show="targetAttribute !== ''">
+                        <label>下限:</label>
+                        <InputNumber :min="0" :max="999" size="small" v-model="lowerValue" controls-position="right"></InputNumber>
+                        <label>上限:</label>
+                        <InputNumber :min="0" :max="999" size="small" v-model="upperValue" controls-position="right"></InputNumber>
                     </div>
                 </FormItem>
                 <FormItem class="attribute-results">
-                    <Tag v-for="lower in this.lowerList" closable :key="lower.split(',')[0]" @close="removeLower(lower)">{{lower}}</Tag>
-                </FormItem>
-                <FormItem label="目标属性上限">
-                    <br/>
-                    <div class="attribute-inputs">
-                        <label>属性:</label>
-                        <Select v-model="upperAttribute">
-                            <Option v-for="attr in attributes" :key="attr" :label="attr" :value="attr"></Option>
-                        </Select>
-                        <label v-show="upperAttribute !== ''">数值:</label>
-                        <InputNumber :min="0" :max="999" size="small" v-model="upperValue" v-show="upperAttribute !== ''"></InputNumber>
-                    </div>
-                </FormItem>
-                <FormItem class="attribute-results">
-                    <Tag v-for="upper in this.upperList" closable :key="upper.split(',')[0]" @close="removeUpper(upper)">{{upper}}</Tag>
+                    <Tag v-for="attr in this.targetAttributeList" closable :key="attr.split(' ')[0]" @close="removeTargetAttribute(attr)">{{attr}}</Tag>
                 </FormItem>
             </Form>
             <Form class="control">
@@ -167,29 +156,21 @@ export default class Calculator extends Vue {
     private healthExpect = '';
 
     /**
-     * 下限属性
+     * 目标属性
      */
-    private lowerAttribute = '';
+    private targetAttribute = '';
     /**
      * 下限数值
      */
     private lowerValue = 0;
     /**
-     * 下限配置列表
-     */
-    private lowerList: string[] = [];
-    /**
-     * 上限属性
-     */
-    private upperAttribute = '';
-    /**
      * 上限数值
      */
-    private upperValue = 0;
+    private upperValue = 999;
     /**
-     * 上限配置列表
+     * 属性限制列表
      */
-    private upperList: string[] = [];
+    private targetAttributeList: string[] = [];
 
     /**
      * 选择的文件名称
@@ -270,64 +251,48 @@ export default class Calculator extends Vue {
     /**
      * 添加下限属性
      */
-    public addLower(): void {
-        const newItem = `${this.lowerAttribute},${this.lowerValue || 0}`;
-        const index = this.lowerList.findIndex((lower) => lower.startsWith(this.lowerAttribute));
+    public addTargetAttribute(): void {
+        const newItem = `${this.targetAttribute} ${this.lowerValue || 0} - ${this.upperValue || 0}`;
+        const index = this.targetAttributeList.findIndex((attr) => attr.startsWith(this.targetAttribute));
         if (index === -1) {
-            this.lowerList.push(newItem);
+            this.targetAttributeList.push(newItem);
         } else {
-            this.lowerList.splice(index, 1, newItem);
+            this.targetAttributeList.splice(index, 1, newItem);
         }
     }
     /**
      * 删除下限属性
      */
-    public removeLower(item: string): void {
-        const index = this.lowerList.findIndex((lower) => lower === item);
+    public removeTargetAttribute(item: string): void {
+        const index = this.targetAttributeList.findIndex((attr) => attr === item);
         if (index !== -1) {
-            this.lowerList.splice(index, 1);
+            this.targetAttributeList.splice(index, 1);
         }
     }
-    @Watch('lowerAttribute')
+    @Watch('targetAttribute')
     public onLowerAttributeChange(val: string) {
         this.lowerValue = 0;
-        this.addLower();
+        this.upperValue = 999;
+        this.addTargetAttribute();
     }
     @Watch('lowerValue')
-    public onLowerValueChange(val: string) {
-        this.addLower();
-    }
-
-    /**
-     * 添加上限属性
-     */
-    public addUpper(): void {
-        const newItem = `${this.upperAttribute},${this.upperValue || 0}`;
-        const index = this.upperList.findIndex((upper) => upper.startsWith(this.upperAttribute));
-        if (index === -1) {
-            this.upperList.push(newItem);
-        } else {
-            this.upperList.splice(index, 1, newItem);
+    public onLowerValueChange(val: number, oldVal: number) {
+        if (oldVal === 0) {
+            this.upperValue = val + 10;
         }
-    }
-    /**
-     * 删除下限属性
-     */
-    public removeUpper(item: string): void {
-        const index = this.upperList.findIndex((upper) => upper === item);
-        if (index !== -1) {
-            this.upperList.splice(index, 1);
+        if (this.upperValue < val) {
+            this.upperValue = val;
         }
-    }
-    @Watch('upperAttribute')
-    public onUpperttributeChange(val: string) {
-        this.upperValue = 0;
-        this.addUpper();
+        this.addTargetAttribute();
     }
     @Watch('upperValue')
-    public onUpperValueChange(val: string) {
-        this.addUpper();
+    public onUpperValueChange(val: number) {
+        if (this.lowerValue > val) {
+            this.lowerValue = val;
+        }
+        this.addTargetAttribute();
     }
+
 
     /**
      * 选择文件
@@ -386,8 +351,14 @@ export default class Calculator extends Vue {
         axios.post(api, {
             src_filename: this.filename,
             mitama_suit: this.yuhunPackageList.join('.'),
-            prop_limit: this.lowerList.join('.'),
-            upper_prop_limit: this.upperList.join('.'),
+            prop_limit: this.targetAttributeList.map(attr => {
+                const [attrName, value] = attr.split(/ |-/);
+                return attrName + ',' + value;
+            }).join('.'),
+            upper_prop_limit: this.targetAttributeList.map(attr => {
+                const [attrName, , , ,value] = attr.split(/ |-/);
+                return attrName + ',' + value;
+            }).join('.'),
             sec_prop_value: this.getPropValue(this.secondAttributeList),
             fth_prop_value: this.getPropValue(this.fourthAttributeList),
             sth_prop_value: this.getPropValue(this.sixthAttributeList),
@@ -504,26 +475,26 @@ export default class Calculator extends Vue {
             flex: 1;
             margin: 0 8px;
 
-            .attribute-inputs {
-                display: flex;
-                label {
-                    color: #f1f1f1;
-                    margin-right: 4px;
-                    &:nth-child(3) {
-                        margin-left: 12px;
-                    }
-                }
-                .el-select {
-                    width: 130px;
-                }
-                .el-button {
-                    height: 34px;
+            label {
+                color: #f1f1f1;
+                margin-right: 4px;
+                &:nth-child(3) {
                     margin-left: 12px;
-                    transform: translateY(2px);
-                    span {
-                        position: relative;
-                        top: -3px;
-                    }
+                }
+            }
+            .el-select {
+                width: 130px;
+            }
+            .el-input-number {
+                width: 100px;
+            }
+            .el-button {
+                height: 34px;
+                margin-left: 12px;
+                transform: translateY(2px);
+                span {
+                    position: relative;
+                    top: -3px;
                 }
             }
             .attribute-results {
@@ -561,6 +532,7 @@ export default class Calculator extends Vue {
                 }
             }
             .el-checkbox-button__inner {
+                min-width: 60px;
                 padding: 7px 5px;
                 background-color: #11171f;
                 border: 1px solid #333b47;
@@ -596,7 +568,7 @@ export default class Calculator extends Vue {
     .el-select {
         width: 100%;
     }
-    input, .el-checkbox__inner, .el-input-number__decrease, .el-input-number__increase {
+    input, .el-checkbox__inner {
         background-color: #11171f;
         border: 1px solid #333b47;
         color: #ccc;
@@ -607,6 +579,14 @@ export default class Calculator extends Vue {
     p.title {
         color: #eee;
         line-height: 24px;
+    }
+    .el-input-number__decrease, .el-input-number__increase {
+        background-color: #11171f;
+        border-left-color: #333b47 !important;
+        color: #ccc;
+    }
+    .el-input-number__increase {
+        border-bottom-color: #333b47 !important;
     }
 }
 </style>
