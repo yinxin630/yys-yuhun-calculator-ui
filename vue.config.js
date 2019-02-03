@@ -1,3 +1,3 @@
 module.exports = {
-    publicPath: process.env.NODE === 'production' ? '//cdn.suisuijiang.com/calculator' : '.'
+    publicPath: process.env.NODE_ENV === 'production' ? '//cdn.suisuijiang.com/calculator' : '.'
 };
