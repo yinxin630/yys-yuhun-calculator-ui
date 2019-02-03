@@ -56,10 +56,10 @@
             </Form>
             <Form class="expect-options-form">
                 <FormItem class="input-item" label="伤害期望">
-                    <Input placeholder="格式:基础攻击,基础爆伤,期望值" v-model="damageExpect" />
+                    <Input placeholder="格式: 式神基础攻击,式神基础爆伤,期望伤害值" v-model="damageExpect" />
                 </FormItem>
                 <FormItem class="input-item" label="治疗期望">
-                    <Input placeholder="格式:基础生命,基础爆伤,期望值" v-model="healthExpect" />
+                    <Input placeholder="格式: 式神基础生命,式神基础爆伤,期望治疗值" v-model="healthExpect" />
                 </FormItem>
                 <FormItem>
                     <p class="title">目标属性限制</p>
