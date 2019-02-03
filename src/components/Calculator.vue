@@ -272,7 +272,7 @@ export default class Calculator extends Vue {
     @Watch('targetAttribute')
     public onLowerAttributeChange(val: string) {
         this.lowerValue = 0;
-        this.upperValue = 999;
+        this.upperValue = 0;
         this.addTargetAttribute();
     }
     @Watch('lowerValue')
