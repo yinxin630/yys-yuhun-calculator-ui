@@ -33,7 +33,7 @@ export default class CustomScheme extends Vue {
     @Prop({
         default: {}
     })
-    currentScheme: Scheme
+    currentScheme!: Scheme
 
     /**
      * 方案列表
@@ -86,7 +86,7 @@ export default class CustomScheme extends Vue {
                             const $el = document.querySelector('.schemeSelect input');
                             if ($el) {
                                 setTimeout(() => {
-                                    $el.value = schemeName;
+                                    (<any>$el).value = schemeName;
                                 })
                             }
                         }
