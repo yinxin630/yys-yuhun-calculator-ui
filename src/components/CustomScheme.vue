@@ -7,7 +7,7 @@
             <Button type="primary" @click="selectScheme">选择自定义方案</Button>
         </FormItem>
         <FormItem>
-            <Button type="primary" disabled>选择预设方案</Button>
+            <Button type="primary" disabled>选择预设方案(施工中)</Button>
         </FormItem>
 
         <Dialog :visible="selectSchemeDialog"></Dialog>

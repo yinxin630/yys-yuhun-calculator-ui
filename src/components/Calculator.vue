@@ -291,11 +291,11 @@ export default class Calculator extends Vue {
     }
 
     /**
-     * 添加下限属性
+     * 添加目标属性规则
      */
     public addTargetAttribute(): void {
         const newItem = `${this.targetAttribute} ${this.lowerValue || 0} - ${this.upperValue || 0}`;
-        const index = this.targetAttributeList.findIndex((attr) => attr.startsWith(this.targetAttribute));
+        const index = this.targetAttributeList.findIndex((attr) => attr.split(' ')[0] === this.targetAttribute);
         if (index === -1) {
             this.targetAttributeList.push(newItem);
         } else {
@@ -303,7 +303,7 @@ export default class Calculator extends Vue {
         }
     }
     /**
-     * 删除下限属性
+     * 删除目标属性规则
      */
     public removeTargetAttribute(item: string): void {
         const index = this.targetAttributeList.findIndex((attr) => attr === item);
