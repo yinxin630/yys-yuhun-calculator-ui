@@ -90,7 +90,7 @@
                     <Button v-if="calculateProgress === 100" type="primary" @click="run" :disabled="!serverOnline">开始计算</Button>
                     <Button v-else type="primary" loading>计算中... {{calculateProgress}}%</Button>
                 </FormItem>
-                <CustomScheme :currentScheme="currentScheme" :schemeList="[]"></CustomScheme>
+                <CustomScheme :currentScheme="currentScheme" @selectScheme="handleSelectScheme"></CustomScheme>
             </Form>
         </section>
     </div>
@@ -101,6 +101,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 import { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Message, Tag, Notification, Dialog } from 'element-ui';
 import axios from 'axios';
 
+import Scheme from '../definition/Scheme';
 import CustomScheme from './CustomScheme.vue';
 
 const apiRoot = '//localhost:2019';
@@ -311,10 +312,12 @@ export default class Calculator extends Vue {
         }
     }
     @Watch('targetAttribute')
-    public onLowerAttributeChange(val: string) {
-        this.lowerValue = 0;
-        this.upperValue = 0;
-        this.addTargetAttribute();
+    public ontargetAttributeChange(val: string) {
+        if (val) {
+            this.lowerValue = 0;
+            this.upperValue = 0;
+            this.addTargetAttribute();
+        }
     }
     @Watch('lowerValue')
     public onLowerValueChange(val: number, oldVal: number) {
@@ -367,11 +370,28 @@ export default class Calculator extends Vue {
         $input.click();
     }
 
+    private handleSelectScheme(scheme: Scheme) {
+        this.yuhunPackageList = scheme.yuhunPackageList;
+        this.usePackage = scheme.usePackage;
+        this.useAttack = scheme.useAttack;
+        this.secondAttributeList = scheme.secondAttributeList;
+        this.fourthAttributeList = scheme.fourthAttributeList;
+        this.sixthAttributeList = scheme.sixthAttributeList;
+        this.ignoreSerial = scheme.ignoreSerial;
+        this.damageExpect = scheme.damageExpect;
+        this.healthExpect = scheme.healthExpect;
+        this.targetAttributeList = scheme.targetAttributeList;
+        this.targetAttribute = '';
+    }
+
     private getClaculateStatus() {
         axios
             .get(apiRoot + '/status')
             .then(result => {
-                const {progress = 0} = result.data;
+                const {progress} = result.data;
+                if (progress === undefined) {
+                    return;
+                }
                 this.calculateProgress = Math.floor(progress * 100);
                 if (progress !== 1) {
                     setTimeout(this.getClaculateStatus.bind(this), 100);
