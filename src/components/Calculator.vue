@@ -87,7 +87,8 @@
                     <Button type="primary" @click="selectFile">选择文件</Button>
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" @click="run" :disabled="!serverOnline">开始计算</Button>
+                    <Button v-if="calculateProgress === 100" type="primary" @click="run" :disabled="!serverOnline">开始计算</Button>
+                    <Button v-else type="primary" loading>计算中... {{calculateProgress}}%</Button>
                 </FormItem>
             </Form>
         </section>
@@ -177,6 +178,11 @@ export default class Calculator extends Vue {
      * 选择的文件名称
      */
     private filename = '';
+
+    /**
+     * 计算进度
+     */
+    private calculateProgress = 100;
 
     /**
      * 御魂套装选项
@@ -340,6 +346,21 @@ export default class Calculator extends Vue {
         $input.click();
     }
 
+    private getClaculateStatus() {
+        axios
+            .get(apiRoot + '/status')
+            .then(result => {
+                const {progress = 0} = result.data;
+                this.calculateProgress = Math.floor(progress * 100);
+                if (progress !== 1) {
+                    setTimeout(this.getClaculateStatus.bind(this), 100);
+                }
+            })
+            .catch(() => {
+                console.warn('获取计算进度失败');
+            })
+    }
+
     /**
      * 获取后端所需的 prop_value 格式文本
      */
@@ -362,7 +383,7 @@ export default class Calculator extends Vue {
             return;
         }
 
-        axios.post(apiRoot + '/calculator', {
+        axios.post(apiRoot + '/calculate', {
             src_filename: this.filename,
             mitama_suit: this.yuhunPackageList.join('.'),
             prop_limit: this.targetAttributeList.map(attr => {
@@ -402,6 +423,8 @@ export default class Calculator extends Vue {
         }).catch((err) => {
             Message.error('计算失败');
         });
+
+        setTimeout(this.getClaculateStatus.bind(this), 200);
     }
 }
 </script>
