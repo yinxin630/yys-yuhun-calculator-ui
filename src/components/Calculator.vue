@@ -87,7 +87,7 @@
                     <Button type="primary" @click="selectFile">选择文件</Button>
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" @click="run">开始计算</Button>
+                    <Button type="primary" @click="run" :disabled="!serverOnline">开始计算</Button>
                 </FormItem>
             </Form>
         </section>
@@ -96,10 +96,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Message, Tag } from 'element-ui';
+import { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Message, Tag, Notification } from 'element-ui';
 import axios from 'axios';
 
-const api = '//localhost:2019/calculate';
+const apiRoot = '//localhost:2019';
 const axiosOption = {
     validateStatus(status: number) {
         return status >= 200 && status <= 500;
@@ -110,6 +110,7 @@ const axiosOption = {
     components: { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Tag },
 })
 export default class Calculator extends Vue {
+    private serverOnline = true;
     /**
      * 御魂套装
      */
@@ -214,6 +215,9 @@ export default class Calculator extends Vue {
         return ['暴击', '暴击伤害', '效果命中', '效果抵抗', '速度', '攻击加成', '生命加成', '防御加成'];
     }
 
+    /**
+     * 是否禁用添加御魂套装按钮
+     */
     get disableAddYuhunPackageButton(): boolean {
         if (!this.yuhunPackage) {
             return true;
@@ -228,6 +232,9 @@ export default class Calculator extends Vue {
         return currentSelectCount + this.selectedYuhunPackageCount > 6;
     }
 
+    /**
+     * 已选的御魂套装组合所用的御魂个数
+     */
     get selectedYuhunPackageCount(): number {
         return this.yuhunPackageList
             .map((yuhunPackage) => {
@@ -235,6 +242,13 @@ export default class Calculator extends Vue {
                 return +count;
             })
             .reduce((sum, value) => sum += value, 0);
+    }
+
+    private mounted() {
+        axios.get(apiRoot + '/status').catch(() => {
+            Notification.error('未检测到服务端, 请先启动服务端后再试');
+            this.serverOnline = false;
+        })
     }
 
     /**
@@ -348,7 +362,7 @@ export default class Calculator extends Vue {
             return;
         }
 
-        axios.post(api, {
+        axios.post(apiRoot + '/calculator', {
             src_filename: this.filename,
             mitama_suit: this.yuhunPackageList.join('.'),
             prop_limit: this.targetAttributeList.map(attr => {
