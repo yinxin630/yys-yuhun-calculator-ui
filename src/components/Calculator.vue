@@ -90,6 +90,7 @@
                     <Button v-if="calculateProgress === 100" type="primary" @click="run" :disabled="!serverOnline">开始计算</Button>
                     <Button v-else type="primary" loading>计算中... {{calculateProgress}}%</Button>
                 </FormItem>
+                <CustomScheme :currentScheme="currentScheme" :schemeList="[]"></CustomScheme>
             </Form>
         </section>
     </div>
@@ -97,8 +98,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Message, Tag, Notification } from 'element-ui';
+import { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Message, Tag, Notification, Dialog } from 'element-ui';
 import axios from 'axios';
+
+import CustomScheme from './CustomScheme.vue';
 
 const apiRoot = '//localhost:2019';
 const axiosOption = {
@@ -108,7 +111,7 @@ const axiosOption = {
 };
 
 @Component({
-    components: { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Tag },
+    components: { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Tag, Dialog, CustomScheme },
 })
 export default class Calculator extends Vue {
     private serverOnline = true;
@@ -205,13 +208,13 @@ export default class Calculator extends Vue {
             list: ['树妖,4', '地藏像,4', '薙魂,4', '镜姬,4', '钟灵,4', '涅槃之火,4', '被服,4'],
         }, {
             name: '防御加成',
-            list: ['珍珠,4', '魅妖,4', '雪幽魂,4', '招财猫,4', '反枕,4', '日女己时,4', '木魅'],
+            list: ['珍珠,4', '魅妖,4', '雪幽魂,4', '招财猫,4', '反枕,4', '日女己时,4', '木魅,4'],
         }, {
             name: '效果命中',
             list: ['蚌精,4', '火灵,4'],
         }, {
             name: '效果抵抗',
-            list: ['骰子鬼,4', '返魂香,4', '幽谷响,4', '魍魉之匣' ],
+            list: ['骰子鬼,4', '返魂香,4', '幽谷响,4', '魍魉之匣,4' ],
         }];
     }
     /**
@@ -248,6 +251,24 @@ export default class Calculator extends Vue {
                 return +count;
             })
             .reduce((sum, value) => sum += value, 0);
+    }
+
+    /**
+     * 当前编辑中的方案
+     */
+    get currentScheme(): Object {
+        return {
+            yuhunPackageList: this.yuhunPackageList,
+            usePackage: this.usePackage,
+            useAttack: this.useAttack,
+            secondAttributeList: this.secondAttributeList,
+            fourthAttributeList: this.fourthAttributeList,
+            sixthAttributeList: this.sixthAttributeList,
+            ignoreSerial: this.ignoreSerial,
+            damageExpect: this.damageExpect,
+            healthExpect: this.healthExpect,
+            targetAttributeList: this.targetAttributeList,
+        }
     }
 
     private mounted() {
@@ -473,6 +494,12 @@ export default class Calculator extends Vue {
             .el-button {
                 width: 100%;
                 margin-bottom: 12px;
+            }
+            .custom-setting {
+                margin-top: 50px;
+                .el-button {
+                    margin-bottom: 5px;
+                }
             }
         }
         .filter-options-form {
