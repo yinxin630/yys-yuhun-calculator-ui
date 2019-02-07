@@ -4,13 +4,11 @@
             <Button type="primary" @click="saveScheme">保存当前方案</Button>
         </FormItem>
         <FormItem>
-            <Button type="primary" @click="selectScheme">选择自定义方案</Button>
+            <Button type="primary" @click="selectCustomScheme">选择自定义方案</Button>
         </FormItem>
         <FormItem>
-            <Button type="primary" disabled>选择预设方案(施工中)</Button>
+            <Button type="primary" @click="selectDefaultScheme">选择预设方案</Button>
         </FormItem>
-
-        <Dialog :visible="selectSchemeDialog"></Dialog>
     </div>
 </template>
 
@@ -19,6 +17,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { FormItem, Button, MessageBox, Select, Option, Dialog, Message } from 'element-ui';
 
 import Scheme from '../definition/Scheme';
+import defaultSchemeList from '../data/defaultScheme.json';
 
 const StorageKey = 'customSchemeList';
 const storageSchemeList = window.localStorage.getItem(StorageKey) || '[]';
@@ -41,11 +40,15 @@ export default class CustomScheme extends Vue {
     private schemeList: Scheme[] = JSON.parse(storageSchemeList)
 
     /**
-     * 选中的方案名称
+     * 选中的自定义方案名称
      */
-    private selectSchemeName = ''
+    private selectedCustomSchemeName = ''
 
-    private selectSchemeDialog = false;
+    /**
+     * 选中的预设方案名称
+     */
+    private selectedDefaultSchemeName = ''
+
 
     /**
      * 保存到本地存储
@@ -69,7 +72,7 @@ export default class CustomScheme extends Vue {
     /**
      * 选择自定义方案
      */
-    private selectScheme() {
+    private selectCustomScheme() {
         const h = this.$createElement;
         MessageBox({
             title: '自定义方案列表',
@@ -77,13 +80,12 @@ export default class CustomScheme extends Vue {
                 'Select',
                 {
                     props:{
-                        value: this.selectSchemeName,
+                        value: this.selectedCustomSchemeName,
                     },
                     on: {
                         change: (schemeName: string) => {
-                            console.log('change', schemeName);
-                            this.selectSchemeName = schemeName;
-                            const $el = document.querySelector('.schemeSelect input');
+                            this.selectedCustomSchemeName = schemeName;
+                            const $el = document.querySelector('.customSchemeSelect input');
                             if ($el) {
                                 setTimeout(() => {
                                     (<any>$el).value = schemeName;
@@ -91,7 +93,7 @@ export default class CustomScheme extends Vue {
                             }
                         }
                     },
-                    staticClass: 'schemeSelect'
+                    staticClass: 'customSchemeSelect'
                 },
                 [
                     this.schemeList.map(scheme => h(
@@ -112,7 +114,7 @@ export default class CustomScheme extends Vue {
             cancelButtonClass: 'delete',
             distinguishCancelAndClose: true,
         }).then(() => {
-            const selectScheme = this.schemeList.find(scheme => scheme.name === this.selectSchemeName);
+            const selectScheme = this.schemeList.find(scheme => scheme.name === this.selectedCustomSchemeName);
             if (selectScheme) {
                 this.$emit('selectScheme', selectScheme);
                 Message.success(`应用自定义方案「${selectScheme.name}」成功`);
@@ -122,14 +124,64 @@ export default class CustomScheme extends Vue {
                 return;
             }
 
-            const schemeIndex = this.schemeList.findIndex(scheme => scheme.name === this.selectSchemeName);
+            const schemeIndex = this.schemeList.findIndex(scheme => scheme.name === this.selectedCustomSchemeName);
             if (schemeIndex !== -1) {
                 Message.success(`删除自定义方案「${this.schemeList[schemeIndex].name}」成功`);
                 this.schemeList.splice(schemeIndex, 1);
                 this.saveStorage();
-                this.selectSchemeName = '';
+                this.selectedCustomSchemeName = '';
             }
         })
+    }
+
+    /**
+     * 选择预设方案
+     */
+    private selectDefaultScheme() {
+        const h = this.$createElement;
+        MessageBox({
+            title: '预设方案列表',
+            message: h(
+                'Select',
+                {
+                    props:{
+                        value: this.selectedDefaultSchemeName,
+                    },
+                    on: {
+                        change: (schemeName: string) => {
+                            this.selectedDefaultSchemeName = schemeName;
+                            const $el = document.querySelector('.defaultSchemeSelect input');
+                            if ($el) {
+                                setTimeout(() => {
+                                    (<any>$el).value = schemeName;
+                                })
+                            }
+                        }
+                    },
+                    staticClass: 'defaultSchemeSelect'
+                },
+                [
+                    (defaultSchemeList as Scheme[]).map(scheme => h(
+                        'Option',
+                        {
+                            props: {
+                                key: scheme.name,
+                                label: scheme.name,
+                                value: scheme.name,
+                            }
+                        }
+                    ))
+                ]
+            ),
+            confirmButtonText: '选择',
+            distinguishCancelAndClose: true,
+        }).then(() => {
+            const selectScheme = (defaultSchemeList as Scheme[]).find(scheme => scheme.name === this.selectedDefaultSchemeName);
+            if (selectScheme) {
+                this.$emit('selectScheme', selectScheme);
+                Message.success(`应用预设方案「${selectScheme.name}」成功`);
+            }
+        });
     }
 }
 </script>
