@@ -7,7 +7,7 @@
             <Button type="primary" @click="selectCustomScheme">选择自定义方案</Button>
         </FormItem>
         <FormItem>
-            <Button type="primary" @click="selectDefaultScheme">选择预设方案</Button>
+            <Button type="primary" @click="selectPresetScheme">选择预设方案</Button>
         </FormItem>
     </div>
 </template>
@@ -17,7 +17,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { FormItem, Button, MessageBox, Select, Option, Dialog, Message } from 'element-ui';
 
 import Scheme from '../definition/Scheme';
-import defaultSchemeList from '../data/defaultScheme.json';
+import presetSchemeList from '../data/presetScheme.json';
 
 const StorageKey = 'customSchemeList';
 const storageSchemeList = window.localStorage.getItem(StorageKey) || '[]';
@@ -47,7 +47,7 @@ export default class CustomScheme extends Vue {
     /**
      * 选中的预设方案名称
      */
-    private selectedDefaultSchemeName = ''
+    private selectedPresetSchemeName = ''
 
 
     /**
@@ -137,7 +137,7 @@ export default class CustomScheme extends Vue {
     /**
      * 选择预设方案
      */
-    private selectDefaultScheme() {
+    private selectPresetScheme() {
         const h = this.$createElement;
         MessageBox({
             title: '预设方案列表',
@@ -145,12 +145,12 @@ export default class CustomScheme extends Vue {
                 'Select',
                 {
                     props:{
-                        value: this.selectedDefaultSchemeName,
+                        value: this.selectedPresetSchemeName,
                     },
                     on: {
                         change: (schemeName: string) => {
-                            this.selectedDefaultSchemeName = schemeName;
-                            const $el = document.querySelector('.defaultSchemeSelect input');
+                            this.selectedPresetSchemeName = schemeName;
+                            const $el = document.querySelector('.preset-scheme-select input');
                             if ($el) {
                                 setTimeout(() => {
                                     (<any>$el).value = schemeName;
@@ -158,10 +158,10 @@ export default class CustomScheme extends Vue {
                             }
                         }
                     },
-                    staticClass: 'defaultSchemeSelect'
+                    staticClass: 'preset-scheme-select'
                 },
                 [
-                    (defaultSchemeList as Scheme[]).map(scheme => h(
+                    (presetSchemeList as Scheme[]).map(scheme => h(
                         'Option',
                         {
                             props: {
@@ -176,7 +176,7 @@ export default class CustomScheme extends Vue {
             confirmButtonText: '选择',
             distinguishCancelAndClose: true,
         }).then(() => {
-            const selectScheme = (defaultSchemeList as Scheme[]).find(scheme => scheme.name === this.selectedDefaultSchemeName);
+            const selectScheme = (presetSchemeList as Scheme[]).find(scheme => scheme.name === this.selectedPresetSchemeName);
             if (selectScheme) {
                 this.$emit('selectScheme', selectScheme);
                 Message.success(`应用预设方案「${selectScheme.name}」成功`);
