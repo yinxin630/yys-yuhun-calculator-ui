@@ -536,11 +536,16 @@ export default class Calculator extends Vue {
                 .el-select {
                     width: 200px;
                     margin-bottom: 8px;
+
+                    .el-select__caret {
+                        line-height: 34px;
+                    }
                 }
                 .el-button {
                     margin-left: 10px;
                     width: 90px;
                     height: 34px;
+                    transform: translateY(2px);
 
                     span {
                         position: relative;
