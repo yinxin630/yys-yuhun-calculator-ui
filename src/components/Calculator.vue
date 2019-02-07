@@ -14,7 +14,7 @@
                     </Select>
                     <Button type="primary" @click="addYuhunPackageLimit" :disabled="disableAddYuhunPackageButton">添加</Button>
                     <div class="select-yuhun-list">
-                        <Tag v-for="yuhunPackage in this.yuhunPackageList" closable :key="yuhunPackage" @close="removeYuhunPackageLimit(yuhunPackage)">{{yuhunPackage}}</Tag>
+                        <Tag v-for="(yuhunPackage, index) in this.yuhunPackageList" closable :key="index" @close="removeYuhunPackageLimit(yuhunPackage)">{{yuhunPackage}}</Tag>
                     </div>
                 </div>
                 <FormItem>
@@ -282,8 +282,11 @@ export default class Calculator extends Vue {
     /**
      * 添加御魂套装限制
      */
+    @Watch('yuhunPackage')
     public addYuhunPackageLimit(): void {
-        this.yuhunPackageList.push(this.yuhunPackage);
+        if (!this.disableAddYuhunPackageButton) {
+            this.yuhunPackageList.push(this.yuhunPackage);
+        }
     }
     public removeYuhunPackageLimit(yuhunPackage: string): void {
         const index = this.yuhunPackageList.findIndex((x) => x === yuhunPackage);
