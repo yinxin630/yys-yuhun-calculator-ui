@@ -451,8 +451,11 @@ export default class Calculator extends Vue {
         }, axiosOption).then((result) => {
             switch (result.status) {
                 case 500: {
-                    Message.error('计算失败, 服务端错误');
-                    console.error(result.data.reason);
+                    Message({
+                        type: 'error',
+                        message: `计算失败, 服务端错误: ${result.data.reason}`,
+                        duration: 5000,
+                    });
                     break;
                 }
                 case 200: {
