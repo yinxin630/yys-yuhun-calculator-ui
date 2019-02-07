@@ -1,7 +1,7 @@
 [
     {
         "name": "吃星暴伤针女大天狗",
-        "yuhunPackageList": [],
+        "yuhunPackageList": ["针女,4"],
         "usePackage": true,
         "useAttack": true,
         "secondAttributeList": ["攻击加成"],
@@ -14,7 +14,7 @@
     },
     {
         "name": "超星暴伤针女大天狗",
-        "yuhunPackageList": [],
+        "yuhunPackageList": ["针女,4"],
         "usePackage": true,
         "useAttack": true,
         "secondAttributeList": ["攻击加成"],
@@ -27,7 +27,7 @@
     },
     {
         "name": "超星荒骷髅茨木",
-        "yuhunPackageList": [],
+        "yuhunPackageList": ["破势,4", "荒骷髅,2"],
         "usePackage": true,
         "useAttack": true,
         "secondAttributeList": ["攻击加成"],
@@ -40,7 +40,7 @@
     },
     {
         "name": "超星普通茨木",
-        "yuhunPackageList": [],
+        "yuhunPackageList": ["破势,4"],
         "usePackage": true,
         "useAttack": true,
         "secondAttributeList": ["攻击加成"],
@@ -52,7 +52,7 @@
         "targetAttributeList": ["暴击 90 - 95", "速度 16 - 999"]
     },{
         "name": "吃星荒骷髅茨木",
-        "yuhunPackageList": [],
+        "yuhunPackageList": ["破势,4", "荒骷髅,2"],
         "usePackage": true,
         "useAttack": true,
         "secondAttributeList": ["攻击加成"],
@@ -64,7 +64,7 @@
         "targetAttributeList": ["暴击 90 - 95", "速度 0 - 16"]
     },{
         "name": "吃星普通茨木",
-        "yuhunPackageList": [],
+        "yuhunPackageList": ["破势,4"],
         "usePackage": true,
         "useAttack": true,
         "secondAttributeList": ["攻击加成"],
@@ -76,7 +76,7 @@
         "targetAttributeList": ["暴击 90 - 95", "速度 0 - 16"]
     },{
         "name": "暴伤玉藻前",
-        "yuhunPackageList": [],
+        "yuhunPackageList": ["破势,4"],
         "usePackage": true,
         "useAttack": true,
         "secondAttributeList": ["攻击加成"],
@@ -88,7 +88,7 @@
         "targetAttributeList": ["暴击 88 - 95"]
     },{
         "name": "正堆+反堆暴伤针女",
-        "yuhunPackageList": [],
+        "yuhunPackageList": ["针女,4"],
         "usePackage": true,
         "useAttack": true,
         "secondAttributeList": ["攻击加成"],
@@ -100,8 +100,8 @@
         "targetAttributeList": ["暴击 90 - 95", "暴击伤害 80 - 999"]
     },{
         "name": "散件蜃气楼生生暴书翁",
-        "yuhunPackageList": [],
-        "usePackage": true,
+        "yuhunPackageList": ["蜃气楼,2"],
+        "usePackage": false,
         "useAttack": false,
         "secondAttributeList": ["生命加成"],
         "fourthAttributeList": ["生命加成"],
