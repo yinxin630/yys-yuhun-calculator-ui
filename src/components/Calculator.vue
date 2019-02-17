@@ -442,10 +442,10 @@ export default class Calculator extends Vue {
             fth_prop_value: this.getPropValue(this.fourthAttributeList),
             sth_prop_value: this.getPropValue(this.sixthAttributeList),
             ignore_serial: this.ignoreSerial,
-            all_suit: this.usePackage ? true : false,
+            all_suit: this.usePackage,
             damage_limit: this.damageExpect || '0,0,0',
             health_limit: this.healthExpect || '0,0,0',
-            attack_only: this.useAttack ? true : false,
+            attack_only: this.useAttack,
             effective_secondary_prop: '',
             effective_secondary_prop_num: '',
         }, axiosOption).then((result) => {
@@ -674,6 +674,7 @@ export default class Calculator extends Vue {
     p.title {
         color: #eee;
         line-height: 24px;
+        font-size: 14px;
     }
     .el-input-number__decrease, .el-input-number__increase {
         background-color: #11171f;
