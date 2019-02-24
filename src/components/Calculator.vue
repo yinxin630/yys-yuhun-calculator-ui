@@ -51,15 +51,20 @@
                     </CheckboxGroup>
                 </FormItem>
                 <FormItem label="">
-                    <Input placeholder="忽略指定关键字御魂(以,分隔)" v-model="ignoreSerial" />
+                    <p class="title">忽略指定关键字御魂 (选填)</p>
+                    <Input placeholder="御魂列表(以,分隔)" v-model="ignoreSerial" />
                 </FormItem>
             </Form>
             <Form class="expect-options-form">
-                <FormItem class="input-item" label="伤害期望">
+                <FormItem class="input-item" label="伤害期望 (选填)">
                     <Input placeholder="格式: 式神基础攻击,式神基础爆伤,期望伤害值" v-model="damageExpect" />
                 </FormItem>
-                <FormItem class="input-item" label="治疗期望">
+                <FormItem class="input-item" label="治疗期望 (选填)">
                     <Input placeholder="格式: 式神基础生命,式神基础爆伤,期望治疗值" v-model="healthExpect" />
+                </FormItem>
+                <FormItem class="input-item" label="有效副属性 (选填)">
+                    <Input placeholder="属性列表(以,分隔)  例如: 暴击,暴击伤害" v-model="effectiveAttributes" />
+                    <Input placeholder="各位置加成次数(以,分隔)  例如: 3,3,3,3,3,0" v-model="effectiveAttributesBonusCount" />
                 </FormItem>
                 <FormItem>
                     <p class="title">目标属性限制</p>
@@ -244,6 +249,14 @@ export default class Calculator extends Vue {
      * 生命期望
      */
     private healthExpect = '';
+    /**
+     * 有限副属性
+     */
+    private effectiveAttributes = '';
+    /**
+     * 有效副属性各位置加成次数
+     */
+    private effectiveAttributesBonusCount = '';
 
     /**
      * 目标属性
@@ -394,8 +407,8 @@ export default class Calculator extends Vue {
             damage_limit: this.damageExpect || '0,0,0',
             health_limit: this.healthExpect || '0,0,0',
             attack_only: this.useAttack,
-            effective_secondary_prop: '',
-            effective_secondary_prop_num: '',
+            effective_secondary_prop: this.effectiveAttributes || '',
+            effective_secondary_prop_num: this.effectiveAttributesBonusCount || '',
         }, axiosOption).then((result) => {
             switch (result.status) {
                 case 500: {
