@@ -51,18 +51,18 @@
                     </CheckboxGroup>
                 </FormItem>
                 <FormItem label="">
-                    <p class="title">忽略指定关键字御魂 (选填)</p>
+                    <p class="title">忽略指定关键字御魂</p>
                     <Input placeholder="御魂列表(以,分隔)" v-model="ignoreSerial" />
                 </FormItem>
             </Form>
             <Form class="expect-options-form">
-                <FormItem class="input-item" label="伤害期望 (选填)">
+                <FormItem class="input-item" label="伤害期望">
                     <Input placeholder="格式: 式神基础攻击,式神基础爆伤,期望伤害值" v-model="damageExpect" />
                 </FormItem>
-                <FormItem class="input-item" label="治疗期望 (选填)">
+                <FormItem class="input-item" label="治疗期望">
                     <Input placeholder="格式: 式神基础生命,式神基础爆伤,期望治疗值" v-model="healthExpect" />
                 </FormItem>
-                <FormItem class="input-item" label="有效副属性 (选填)">
+                <FormItem class="input-item" label="有效副属性">
                     <Input placeholder="属性列表(以,分隔)  例如: 暴击,暴击伤害" v-model="effectiveAttributes" />
                     <Input placeholder="各位置加成次数(以,分隔)  例如: 3,3,3,3,3,0" v-model="effectiveAttributesBonusCount" />
                 </FormItem>
@@ -379,12 +379,37 @@ export default class Calculator extends Vue {
         $input.click();
     }
 
+    public verifyInputValue(): boolean {
+        if (this.damageExpect && !/^[0-9]+,[0-9]+,[0-9]+$/.test(this.damageExpect)) {
+            Message.warning('"伤害期望" 格式错误')
+            return false;
+        }
+        if (this.healthExpect && !/^[0-9]+,[0-9]+,[0-9]+$/.test(this.healthExpect)) {
+            Message.warning('"治疗期望" 格式错误')
+            return false;
+        }
+        if (this.effectiveAttributes && !/^(攻击加成|生命加成|防御加成|速度|效果命中|效果抵抗|暴击|暴击伤害)(,(攻击加成|生命加成|防御加成|速度|效果命中|效果抵抗|暴击|暴击伤害))*$/.test(this.effectiveAttributes)) {
+            Message.warning('"有效副属性 => 属性列表" 格式错误')
+            return false;
+        }
+        if (this.effectiveAttributesBonusCount && !/^[0-9]+,[0-9]+,[0-9]+,[0-9]+,[0-9]+,[0-9]+$/.test(this.effectiveAttributesBonusCount)) {
+            Message.warning('"有效副属性 => 各位置加成次数" 格式错误')
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * 开始计算
      */
     public run() {
         if (!this.filename) {
             Message.warning('请先选择御魂数据文件');
+            return;
+        }
+
+        if (!this.verifyInputValue()) {
             return;
         }
 
