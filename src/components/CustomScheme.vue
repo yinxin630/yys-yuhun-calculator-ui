@@ -23,31 +23,31 @@ const StorageKey = 'customSchemeList';
 const storageSchemeList = window.localStorage.getItem(StorageKey) || '[]';
 
 @Component({
-    components: { FormItem, Button, Select, Option, Dialog }
+    components: { FormItem, Button, Select, Option, Dialog },
 })
 export default class CustomScheme extends Vue {
     /**
      * 当前编辑中的方案
      */
     @Prop({
-        default: {}
+        default: {},
     })
-    currentScheme!: Scheme
+    public currentScheme!: Scheme;
 
     /**
      * 方案列表
      */
-    private schemeList: Scheme[] = JSON.parse(storageSchemeList)
+    private schemeList: Scheme[] = JSON.parse(storageSchemeList);
 
     /**
      * 选中的自定义方案名称
      */
-    private selectedCustomSchemeName = ''
+    private selectedCustomSchemeName = '';
 
     /**
      * 选中的预设方案名称
      */
-    private selectedPresetSchemeName = ''
+    private selectedPresetSchemeName = '';
 
 
     /**
@@ -79,7 +79,7 @@ export default class CustomScheme extends Vue {
             message: h(
                 'Select',
                 {
-                    props:{
+                    props: {
                         value: this.selectedCustomSchemeName,
                     },
                     on: {
@@ -88,25 +88,25 @@ export default class CustomScheme extends Vue {
                             const $el = document.querySelector('.customSchemeSelect input');
                             if ($el) {
                                 setTimeout(() => {
-                                    (<any>$el).value = schemeName;
-                                })
+                                    ($el as any).value = schemeName;
+                                });
                             }
-                        }
+                        },
                     },
-                    staticClass: 'customSchemeSelect'
+                    staticClass: 'customSchemeSelect',
                 },
                 [
-                    this.schemeList.map(scheme => h(
+                    this.schemeList.map((scheme) => h(
                         'Option',
                         {
                             props: {
                                 key: scheme.name,
                                 label: scheme.name,
                                 value: scheme.name,
-                            }
-                        }
-                    ))
-                ]
+                            },
+                        },
+                    )),
+                ],
             ),
             showCancelButton: true,
             confirmButtonText: '选择',
@@ -114,24 +114,24 @@ export default class CustomScheme extends Vue {
             cancelButtonClass: 'delete',
             distinguishCancelAndClose: true,
         }).then(() => {
-            const selectScheme = this.schemeList.find(scheme => scheme.name === this.selectedCustomSchemeName);
+            const selectScheme = this.schemeList.find((scheme) => scheme.name === this.selectedCustomSchemeName);
             if (selectScheme) {
                 this.$emit('selectScheme', selectScheme);
                 Message.success(`应用自定义方案「${selectScheme.name}」成功`);
             }
         }).catch((action) => {
-            if (action === 'close'){
+            if (action === 'close') {
                 return;
             }
 
-            const schemeIndex = this.schemeList.findIndex(scheme => scheme.name === this.selectedCustomSchemeName);
+            const schemeIndex = this.schemeList.findIndex((scheme) => scheme.name === this.selectedCustomSchemeName);
             if (schemeIndex !== -1) {
                 Message.success(`删除自定义方案「${this.schemeList[schemeIndex].name}」成功`);
                 this.schemeList.splice(schemeIndex, 1);
                 this.saveStorage();
                 this.selectedCustomSchemeName = '';
             }
-        })
+        });
     }
 
     /**
@@ -144,7 +144,7 @@ export default class CustomScheme extends Vue {
             message: h(
                 'Select',
                 {
-                    props:{
+                    props: {
                         value: this.selectedPresetSchemeName,
                     },
                     on: {
@@ -153,30 +153,30 @@ export default class CustomScheme extends Vue {
                             const $el = document.querySelector('.preset-scheme-select input');
                             if ($el) {
                                 setTimeout(() => {
-                                    (<any>$el).value = schemeName;
-                                })
+                                    ($el as any).value = schemeName;
+                                });
                             }
-                        }
+                        },
                     },
-                    staticClass: 'preset-scheme-select'
+                    staticClass: 'preset-scheme-select',
                 },
                 [
-                    (presetSchemeList as Scheme[]).map(scheme => h(
+                    (presetSchemeList as Scheme[]).map((scheme) => h(
                         'Option',
                         {
                             props: {
                                 key: scheme.name,
                                 label: scheme.name,
                                 value: scheme.name,
-                            }
-                        }
-                    ))
-                ]
+                            },
+                        },
+                    )),
+                ],
             ),
             confirmButtonText: '选择',
             distinguishCancelAndClose: true,
         }).then(() => {
-            const selectScheme = (presetSchemeList as Scheme[]).find(scheme => scheme.name === this.selectedPresetSchemeName);
+            const selectScheme = (presetSchemeList as Scheme[]).find((scheme) => scheme.name === this.selectedPresetSchemeName);
             if (selectScheme) {
                 this.$emit('selectScheme', selectScheme);
                 Message.success(`应用预设方案「${selectScheme.name}」成功`);

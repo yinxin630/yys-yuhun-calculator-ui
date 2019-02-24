@@ -115,78 +115,6 @@ const axiosOption = {
     components: { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Tag, Dialog, CustomScheme },
 })
 export default class Calculator extends Vue {
-    private serverOnline = true;
-    /**
-     * 御魂套装
-     */
-    private yuhunPackage = '';
-    /**
-     * 御魂套装限制列表
-     */
-    private yuhunPackageList: string[] = [];
-
-    /**
-     * 是否使用套装
-     */
-    private usePackage = true;
-    /**
-     * 是否使用攻击类御魂
-     */
-    private useAttack = false;
-
-    /**
-     * 二号位属性
-     */
-    private secondAttributeList: string[] = [];
-    /**
-     * 四号位属性
-     */
-    private fourthAttributeList: string[] = [];
-    /**
-     * 六号位属性
-     */
-    private sixthAttributeList: string[] = [];
-
-    /**
-     * 忽略指定关键字御魂
-     */
-    private ignoreSerial = '';
-
-    /**
-     * 伤害期望
-     */
-    private damageExpect = '';
-    /**
-     * 生命期望
-     */
-    private healthExpect = '';
-
-    /**
-     * 目标属性
-     */
-    private targetAttribute = '';
-    /**
-     * 下限数值
-     */
-    private lowerValue = 0;
-    /**
-     * 上限数值
-     */
-    private upperValue = 999;
-    /**
-     * 属性限制列表
-     */
-    private targetAttributeList: string[] = [];
-
-    /**
-     * 选择的文件名称
-     */
-    private filename = '';
-
-    /**
-     * 计算进度
-     */
-    private calculateProgress = 100;
 
     /**
      * 御魂套装选项
@@ -269,15 +197,80 @@ export default class Calculator extends Vue {
             damageExpect: this.damageExpect,
             healthExpect: this.healthExpect,
             targetAttributeList: this.targetAttributeList,
-        }
+        };
     }
+    private serverOnline = true;
+    /**
+     * 御魂套装
+     */
+    private yuhunPackage = '';
+    /**
+     * 御魂套装限制列表
+     */
+    private yuhunPackageList: string[] = [];
 
-    private mounted() {
-        axios.get(apiRoot + '/status').catch(() => {
-            Notification.error('未检测到服务端, 请先启动服务端后再试');
-            this.serverOnline = false;
-        })
-    }
+    /**
+     * 是否使用套装
+     */
+    private usePackage = true;
+    /**
+     * 是否使用攻击类御魂
+     */
+    private useAttack = false;
+
+    /**
+     * 二号位属性
+     */
+    private secondAttributeList: string[] = [];
+    /**
+     * 四号位属性
+     */
+    private fourthAttributeList: string[] = [];
+    /**
+     * 六号位属性
+     */
+    private sixthAttributeList: string[] = [];
+
+    /**
+     * 忽略指定关键字御魂
+     */
+    private ignoreSerial = '';
+
+    /**
+     * 伤害期望
+     */
+    private damageExpect = '';
+    /**
+     * 生命期望
+     */
+    private healthExpect = '';
+
+    /**
+     * 目标属性
+     */
+    private targetAttribute = '';
+    /**
+     * 下限数值
+     */
+    private lowerValue = 0;
+    /**
+     * 上限数值
+     */
+    private upperValue = 999;
+    /**
+     * 属性限制列表
+     */
+    private targetAttributeList: string[] = [];
+
+    /**
+     * 选择的文件名称
+     */
+    private filename = '';
+
+    /**
+     * 计算进度
+     */
+    private calculateProgress = 100;
 
     /**
      * 添加御魂套装限制
@@ -373,51 +366,6 @@ export default class Calculator extends Vue {
         $input.click();
     }
 
-    private handleSelectScheme(scheme: Scheme) {
-        this.yuhunPackageList = scheme.yuhunPackageList;
-        this.usePackage = scheme.usePackage;
-        this.useAttack = scheme.useAttack;
-        this.secondAttributeList = scheme.secondAttributeList;
-        this.fourthAttributeList = scheme.fourthAttributeList;
-        this.sixthAttributeList = scheme.sixthAttributeList;
-        this.ignoreSerial = scheme.ignoreSerial;
-        this.damageExpect = scheme.damageExpect;
-        this.healthExpect = scheme.healthExpect;
-        this.targetAttributeList = scheme.targetAttributeList;
-        this.targetAttribute = '';
-    }
-
-    private getClaculateStatus() {
-        axios
-            .get(apiRoot + '/status')
-            .then(result => {
-                const {progress} = result.data;
-                if (progress === undefined) {
-                    return;
-                }
-                this.calculateProgress = Math.floor(progress * 100);
-                if (progress !== 1) {
-                    setTimeout(this.getClaculateStatus.bind(this), 100);
-                }
-            })
-            .catch(() => {
-                console.warn('获取计算进度失败');
-            })
-    }
-
-    /**
-     * 获取后端所需的 prop_value 格式文本
-     */
-    private getPropValue(attributeList: string[]): string {
-        return attributeList.map(attr => {
-            switch(attr) {
-                case '速度': return '速度,57';
-                case '暴击伤害': return '暴击伤害,89';
-                default: return attr + ',55'
-            }
-        }).join('.');
-    }
-
     /**
      * 开始计算
      */
@@ -430,12 +378,12 @@ export default class Calculator extends Vue {
         axios.post(apiRoot + '/calculate', {
             src_filename: this.filename,
             mitama_suit: this.yuhunPackageList.join('.'),
-            prop_limit: this.targetAttributeList.map(attr => {
+            prop_limit: this.targetAttributeList.map((attr) => {
                 const [attrName, value] = attr.split(/ |-/);
                 return attrName + ',' + value;
             }).join('.'),
-            upper_prop_limit: this.targetAttributeList.map(attr => {
-                const [attrName, , , ,value] = attr.split(/ |-/);
+            upper_prop_limit: this.targetAttributeList.map((attr) => {
+                const [attrName, , , , value] = attr.split(/ |-/);
                 return attrName + ',' + value;
             }).join('.'),
             sec_prop_value: this.getPropValue(this.secondAttributeList),
@@ -472,6 +420,58 @@ export default class Calculator extends Vue {
         });
 
         setTimeout(this.getClaculateStatus.bind(this), 200);
+    }
+
+    private mounted() {
+        axios.get(apiRoot + '/status').catch(() => {
+            Notification.error('未检测到服务端, 请先启动服务端后再试');
+            this.serverOnline = false;
+        });
+    }
+
+    private handleSelectScheme(scheme: Scheme) {
+        this.yuhunPackageList = scheme.yuhunPackageList;
+        this.usePackage = scheme.usePackage;
+        this.useAttack = scheme.useAttack;
+        this.secondAttributeList = scheme.secondAttributeList;
+        this.fourthAttributeList = scheme.fourthAttributeList;
+        this.sixthAttributeList = scheme.sixthAttributeList;
+        this.ignoreSerial = scheme.ignoreSerial;
+        this.damageExpect = scheme.damageExpect;
+        this.healthExpect = scheme.healthExpect;
+        this.targetAttributeList = scheme.targetAttributeList;
+        this.targetAttribute = '';
+    }
+
+    private getClaculateStatus() {
+        axios
+            .get(apiRoot + '/status')
+            .then((result) => {
+                const {progress} = result.data;
+                if (progress === undefined) {
+                    return;
+                }
+                this.calculateProgress = Math.floor(progress * 100);
+                if (progress !== 1) {
+                    setTimeout(this.getClaculateStatus.bind(this), 100);
+                }
+            })
+            .catch(() => {
+                console.warn('获取计算进度失败');
+            });
+    }
+
+    /**
+     * 获取后端所需的 prop_value 格式文本
+     */
+    private getPropValue(attributeList: string[]): string {
+        return attributeList.map((attr) => {
+            switch (attr) {
+                case '速度': return '速度,57';
+                case '暴击伤害': return '暴击伤害,89';
+                default: return attr + ',55';
+            }
+        }).join('.');
     }
 }
 </script>
