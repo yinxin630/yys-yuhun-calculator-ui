@@ -500,7 +500,11 @@ export default class Calculator extends Vue {
 
     private mounted() {
         axios.get(apiRoot + '/status').catch(() => {
-            Notification.error('未检测到服务端, 请先启动服务端后再试');
+            Notification.error({
+                title: '提示',
+                message: '未检测到服务端, 请先启动服务端后再试',
+                duration: 0,
+            });
             this.serverOnline = false;
         });
     }
