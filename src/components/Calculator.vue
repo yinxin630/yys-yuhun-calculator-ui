@@ -410,6 +410,9 @@ export default class Calculator extends Vue {
         $input.click();
     }
 
+    /**
+     * 校验输入框格式
+     */
     public verifyInputValue(): boolean {
         if (this.damageExpect && !/^[0-9]+,[0-9]+,[0-9]+$/.test(this.damageExpect)) {
             Message.warning('"伤害期望" 格式错误');
@@ -509,6 +512,9 @@ export default class Calculator extends Vue {
         });
     }
 
+    /**
+     * 处理选择御魂方案事件
+     */
     private handleSelectScheme(scheme: Scheme) {
         this.yuhunPackageList = scheme.yuhunPackageList;
         this.usePackage = scheme.usePackage;
@@ -523,6 +529,9 @@ export default class Calculator extends Vue {
         this.targetAttribute = '';
     }
 
+    /**
+     * 获取计算进度
+     */
     private getClaculateStatus() {
         axios
             .get(apiRoot + '/status')
