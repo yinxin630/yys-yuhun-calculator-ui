@@ -457,7 +457,7 @@ export default class Calculator extends Vue {
             Message.error('计算失败');
         });
 
-        setTimeout(this.getClaculateStatus.bind(this), 200);
+        setTimeout(this.getClaculateStatus.bind(this), 500);
     }
 
     private mounted() {
