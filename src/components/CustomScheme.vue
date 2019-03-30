@@ -17,7 +17,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { FormItem, Button, MessageBox, Select, Option, Dialog, Message } from 'element-ui';
 
 import Scheme from '../definition/Scheme';
-import presetSchemeList from '../data/presetScheme.json';
+import presetSchemeList from '../data/presetScheme';
 import SchemeSelect from './SchemeSelect.vue';
 
 const StorageKey = 'customSchemeList';
@@ -82,14 +82,14 @@ export default class CustomScheme extends Vue {
                 {
                     key: 'CustomSchemeSelct',
                     props: {
-                        schemeList: this.schemeList
+                        schemeList: this.schemeList,
                     },
                     on: {
                         SelectSchemeChange: (newScheme: string) => {
                             this.selectedCustomSchemeName = newScheme;
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             ),
             showCancelButton: true,
             confirmButtonText: '选择',
@@ -129,14 +129,14 @@ export default class CustomScheme extends Vue {
                 {
                     key: 'PresetSchemeSelct',
                     props: {
-                        schemeList: presetSchemeList
+                        schemeList: presetSchemeList,
                     },
                     on: {
                         SelectSchemeChange: (newScheme: string) => {
                             this.selectedCustomSchemeName = newScheme;
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             ),
             confirmButtonText: '选择',
             distinguishCancelAndClose: true,

@@ -16,15 +16,15 @@ import { Select, Option } from 'element-ui';
 import Scheme from '@/definition/Scheme';
 
 @Component({
-    components: { Select, Option }
+    components: { Select, Option },
 })
 export default class SchemeSelect extends Vue {
-    private selectedPresetSchemeName = ''
 
     @Prop({
-        default: []
+        default: [],
     })
-    public schemeList!: Scheme[]
+    public schemeList!: Scheme[];
+    private selectedPresetSchemeName = '';
 
     @Watch('selectedPresetSchemeName')
     public onSelectSchemeChange() {

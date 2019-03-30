@@ -103,7 +103,23 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
-import { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Message, Tag, Notification, Dialog } from 'element-ui';
+import {
+    Form,
+    FormItem,
+    Button,
+    Select,
+    Option,
+    OptionGroup,
+    CheckboxGroup,
+    Checkbox,
+    CheckboxButton,
+    Input,
+    InputNumber,
+    Message,
+    Tag,
+    Notification,
+    Dialog,
+} from 'element-ui';
 import axios from 'axios';
 
 import Scheme from '../definition/Scheme';
@@ -117,14 +133,29 @@ const axiosOption = {
 };
 
 @Component({
-    components: { Form, FormItem, Button, Select, Option, OptionGroup, CheckboxGroup, Checkbox, CheckboxButton, Input, InputNumber, Tag, Dialog, CustomScheme },
+    components: {
+        Form,
+        FormItem,
+        Button,
+        Select,
+        Option,
+        OptionGroup,
+        CheckboxGroup,
+        Checkbox,
+        CheckboxButton,
+        Input,
+        InputNumber,
+        Tag,
+        Dialog,
+        CustomScheme,
+    },
 })
 export default class Calculator extends Vue {
 
     /**
      * 御魂套装选项
      */
-    get yuhunOptions(): Object[] {
+    get yuhunOptions(): object[] {
         return [{
             name: '散件',
             list: ['攻击加成,2', '暴击,2', '生命加成,2', '效果命中,2', '效果抵抗,2'],
@@ -190,7 +221,7 @@ export default class Calculator extends Vue {
     /**
      * 当前编辑中的方案
      */
-    get currentScheme(): Object {
+    get currentScheme(): object {
         return {
             yuhunPackageList: this.yuhunPackageList,
             usePackage: this.usePackage,
@@ -381,19 +412,26 @@ export default class Calculator extends Vue {
 
     public verifyInputValue(): boolean {
         if (this.damageExpect && !/^[0-9]+,[0-9]+,[0-9]+$/.test(this.damageExpect)) {
-            Message.warning('"伤害期望" 格式错误')
+            Message.warning('"伤害期望" 格式错误');
             return false;
         }
         if (this.healthExpect && !/^[0-9]+,[0-9]+,[0-9]+$/.test(this.healthExpect)) {
-            Message.warning('"治疗期望" 格式错误')
+            Message.warning('"治疗期望" 格式错误');
             return false;
         }
-        if (this.effectiveAttributes && !/^(攻击加成|生命加成|防御加成|速度|效果命中|效果抵抗|暴击|暴击伤害)(,(攻击加成|生命加成|防御加成|速度|效果命中|效果抵抗|暴击|暴击伤害))*$/.test(this.effectiveAttributes)) {
-            Message.warning('"有效副属性 => 属性列表" 格式错误')
+        if (
+            this.effectiveAttributes
+            && !/^(攻击加成|生命加成|防御加成|速度|效果命中|效果抵抗|暴击|暴击伤害)(,(攻击加成|生命加成|防御加成|速度|效果命中|效果抵抗|暴击|暴击伤害))*$/
+                .test(this.effectiveAttributes)
+        ) {
+            Message.warning('"有效副属性 => 属性列表" 格式错误');
             return false;
         }
-        if (this.effectiveAttributesBonusCount && !/^[0-9]+,[0-9]+,[0-9]+,[0-9]+,[0-9]+,[0-9]+$/.test(this.effectiveAttributesBonusCount)) {
-            Message.warning('"有效副属性 => 各位置加成次数" 格式错误')
+        if (
+            this.effectiveAttributesBonusCount
+            && !/^[0-9]+,[0-9]+,[0-9]+,[0-9]+,[0-9]+,[0-9]+$/.test(this.effectiveAttributesBonusCount)
+        ) {
+            Message.warning('"有效副属性 => 各位置加成次数" 格式错误');
             return false;
         }
 
