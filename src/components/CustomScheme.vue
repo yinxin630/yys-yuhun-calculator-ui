@@ -18,12 +18,13 @@ import { FormItem, Button, MessageBox, Select, Option, Dialog, Message } from 'e
 
 import Scheme from '../definition/Scheme';
 import presetSchemeList from '../data/presetScheme.json';
+import SchemeSelect from './SchemeSelect.vue';
 
 const StorageKey = 'customSchemeList';
 const storageSchemeList = window.localStorage.getItem(StorageKey) || '[]';
 
 @Component({
-    components: { FormItem, Button, Select, Option, Dialog },
+    components: { FormItem, Button, Select, Option, Dialog, SchemeSelect },
 })
 export default class CustomScheme extends Vue {
     /**
@@ -77,36 +78,18 @@ export default class CustomScheme extends Vue {
         MessageBox({
             title: '自定义方案列表',
             message: h(
-                'Select',
+                'SchemeSelect',
                 {
+                    key: 'CustomSchemeSelct',
                     props: {
-                        value: this.selectedCustomSchemeName,
+                        schemeList: this.schemeList
                     },
                     on: {
-                        change: (schemeName: string) => {
-                            this.selectedCustomSchemeName = schemeName;
-                            const $el = document.querySelector('.customSchemeSelect input');
-                            if ($el) {
-                                setTimeout(() => {
-                                    ($el as any).value = schemeName;
-                                });
-                            }
-                        },
-                    },
-                    staticClass: 'customSchemeSelect',
-                },
-                [
-                    this.schemeList.map((scheme) => h(
-                        'Option',
-                        {
-                            props: {
-                                key: scheme.name,
-                                label: scheme.name,
-                                value: scheme.name,
-                            },
-                        },
-                    )),
-                ],
+                        SelectSchemeChange: (newScheme: string) => {
+                            this.selectedCustomSchemeName = newScheme;
+                        }
+                    }
+                }
             ),
             showCancelButton: true,
             confirmButtonText: '选择',
@@ -142,44 +125,28 @@ export default class CustomScheme extends Vue {
         MessageBox({
             title: '预设方案列表',
             message: h(
-                'Select',
+                'SchemeSelect',
                 {
+                    key: 'PresetSchemeSelct',
                     props: {
-                        value: this.selectedPresetSchemeName,
+                        schemeList: presetSchemeList
                     },
                     on: {
-                        change: (schemeName: string) => {
-                            this.selectedPresetSchemeName = schemeName;
-                            const $el = document.querySelector('.preset-scheme-select input');
-                            if ($el) {
-                                setTimeout(() => {
-                                    ($el as any).value = schemeName;
-                                });
-                            }
-                        },
-                    },
-                    staticClass: 'preset-scheme-select',
-                },
-                [
-                    (presetSchemeList as Scheme[]).map((scheme) => h(
-                        'Option',
-                        {
-                            props: {
-                                key: scheme.name,
-                                label: scheme.name,
-                                value: scheme.name,
-                            },
-                        },
-                    )),
-                ],
+                        SelectSchemeChange: (newScheme: string) => {
+                            this.selectedCustomSchemeName = newScheme;
+                        }
+                    }
+                }
             ),
             confirmButtonText: '选择',
             distinguishCancelAndClose: true,
         }).then(() => {
-            const selectScheme = (presetSchemeList as Scheme[]).find((scheme) => scheme.name === this.selectedPresetSchemeName);
-            if (selectScheme) {
-                this.$emit('selectScheme', selectScheme);
-                Message.success(`应用预设方案「${selectScheme.name}」成功`);
+            for (const scheme of presetSchemeList) {
+                if (scheme.name === this.selectedCustomSchemeName) {
+                    this.$emit('selectScheme', scheme);
+                    Message.success(`应用预设方案「${this.selectedCustomSchemeName}」成功`);
+                    break;
+                }
             }
         });
     }
